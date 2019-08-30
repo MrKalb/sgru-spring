@@ -10,8 +10,8 @@ Postgres
 To run this application just run mvn spring-boot:run 
 ------
 
-TODO 
+# TODO 
 -----
-# Make Unit tests 
-# Fix auth way - Use JWT insted of basic auth
-# Split this application in more services
+Make Unit tests 
+Fix auth way - Use JWT insted of basic auth
+Split this application in more services
