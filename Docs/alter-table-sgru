@@ -1,0 +1,8 @@
+alter table contributions add person_id integer; 
+
+alter table contributions add constraint fk_person_contribution foreign key(person_id) references person(id);
+
+alter table contributions add payment_status payment_status_domain; 
+
+create domain payment_status_domain as char 
+check(value in ('S','N'));

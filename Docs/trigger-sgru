@@ -1,0 +1,21 @@
+create or replace function fun_controla_carteira() returns trigger
+as $$ 
+declare
+	id_temp integer; 
+begin
+	insert into wallet values (default,0.00) returning id into id_temp; 
+    new.wallet_id := id_temp; 
+    return new; 
+
+end;
+$$ language plpgsql;
+
+create trigger trg_controla_carteira before insert 
+on person
+for each row
+execute procedure fun_controla_carteira();
+
+update person set registration_number = '0100161' where id = 4
+
+
+table person

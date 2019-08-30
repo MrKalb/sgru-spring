@@ -1,0 +1,48 @@
+create or replace function fun_consumption_control() returns trigger
+as $$
+declare
+	wallet_value decimal(10,2);
+    group_value decimal (10,2);
+begin
+	if(TG_OP == 'INSERT') then
+    	select value from wallet w join person p on p.wallet_id = w.id
+        where p.id = new.person_id into wallet_value; 
+        select value from person_group pg join person p on p.group_id = pg.id
+        where p.id = new.person_id into group_value;
+        if((wallet_value - group_value) < 0.00) then 
+        	raise exception 'Not enough money'; 
+        else 
+        	if(date(new.date) - date(current_date)  >= 1 ) then
+        		update wallet set value = value - group_value where id in(
+                	select id from wallet w join person p on p.wallet_id = w.id where p.id=new.person_id);
+            else 
+            	raise exception 'Too soon for consumption';
+        	return new;
+        end if;
+    end if; 
+   end if; 
+    if(TG_OP == 'UPDATE') then 
+		if(date(new.date) - date(current_date)  >= 1 ) then
+        	return new; 
+		else 
+        	raise exception 'To soon to changed consumption';
+        end if; 
+    end if; 
+    if (TG_OP == 'DELETE') then
+  	  if(date(new.date) - date(current_date)  >= 1 ) then
+    	select value from wallet w join person p on p.wallet_id = w.id
+        where p.id = old.person_id into wallet_value; 
+        select value from person_group pg join person p on p.group_id = pg.id
+        where p.id = old.person_id into group_value;
+        update wallet set value = value + group_value where id in(
+                	select id from wallet w join person p on p.wallet_id = w.id where p.id=old.person_id);
+        end if;
+    end if; 
+end; 
+$$ language plpgsql; 
+
+
+create trigger trg_consumption_control before insert or delete or update
+on consumption
+for each row 
+execute procedure fun_consumption_control();

@@ -1,0 +1,16 @@
+create or replace function fun_contribution_control() returns trigger 
+as $$ 
+declare
+begin 
+	
+    if(new.payment_status = 'S') then 
+    	update wallet set value = value + new.value where id in (
+        select id from wallet w join person p on p.wallet_id = w.id where p.id = new.person_id);
+    end if;
+end; 
+$$ language plpgsql;
+
+create trigger trg_contribution_control before update 
+on contributions
+for each row
+execute procedure fun_contribution_control();

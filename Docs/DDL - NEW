@@ -1,0 +1,449 @@
+create domain person_status as char
+	constraint person_status_check check (VALUE = ANY (ARRAY['A'::bpchar, 'I'::bpchar]))
+;
+
+create domain course_shift as char
+	constraint course_shift_check check (VALUE = ANY (ARRAY['I'::bpchar, 'M'::bpchar, 'N'::bpchar, 'T'::bpchar]))
+;
+
+create domain payment_status_domain as char
+	constraint payment_status_domain_check check (VALUE = ANY (ARRAY['S'::bpchar, 'N'::bpchar]))
+;
+
+create table person
+(
+	id serial not null
+		constraint pk_person_id
+			primary key,
+	phone varchar(30),
+	email varchar(100),
+	status person_status not null,
+	name varchar(255) not null,
+	wallet_id integer,
+	group_id integer not null,
+	city_id integer not null,
+	course_id integer not null,
+	registration_number varchar(50) not null,
+	cpf varchar(20) not null,
+	birthday timestamp 
+)
+;
+
+alter table person add 
+constraint UK_PERSON unique (registration_number);
+
+create function fun_controla_carteira() returns trigger
+	language plpgsql
+as $$
+declare
+	id_temp integer; 
+begin
+	insert into wallet values (new.id,0.00) returning id into id_temp; 
+    new.wallet_id := id_temp; 
+    return new; 
+
+end;
+$$
+;
+
+create trigger trg_controla_carteira
+	after insert
+	on person
+	for each row
+	execute procedure fun_controla_carteira()
+;
+
+create table person_group
+(
+	id serial not null
+		constraint pk_person_group_id
+			primary key,
+	description text not null,
+	value numeric(8,2) not null,
+	status person_status not null
+)
+;
+
+alter table person
+	add constraint fk_person_group_id
+		foreign key (group_id) references person_group
+;
+
+create table course
+(
+	id serial not null
+		constraint pk_curso_id
+			primary key,
+	description text not null,
+	shift course_shift not null,
+	level_id integer not null
+)
+;
+
+alter table person
+	add constraint fk_course_id
+		foreign key (course_id) references course
+;
+
+create table level
+(
+	id serial not null
+		constraint pk_level_id
+			primary key,
+	description varchar(250) not null
+)
+;
+
+alter table course
+	add constraint fk_level_id
+		foreign key (level_id) references level
+;
+
+create table state
+(
+	id serial not null
+		constraint pk_state_id
+			primary key,
+	description varchar(50) not null,
+	uf char(2) not null
+)
+;
+
+create table city
+(
+	id serial not null
+		constraint pk_city_id
+			primary key,
+	description varchar(60) not null, 
+	state_id integer not null
+ 		constraint fk_city_state_id
+			references state
+)
+;
+
+alter table person
+	add constraint fk_city_id
+		foreign key (city_id) references city
+;
+
+create table wallet
+(
+	id serial not null
+		constraint pk_wallet_id
+			primary key
+		constraint fk_wallet_id
+			references person,
+	value numeric(15,2) not null
+)
+;
+
+alter table person
+	add constraint fk_wallet_id
+		foreign key (wallet_id) references wallet
+;
+
+create table contributions
+(
+	id serial not null
+		constraint pk_contributions_id
+			primary key,
+	gru varchar(250) not null,
+	date timestamp not null,
+	value numeric(15,2) not null,
+	person_id integer not null
+		constraint fk_person_contribution
+			references person,
+	payment_status payment_status_domain
+)
+;
+
+create or replace function fun_contribution_control() returns trigger
+	language plpgsql
+as $$
+declare
+begin 
+	
+    if(new.payment_status = 'S') then 
+    	perform * from wallet where id = new.person_id for update; -- lock especifico apenas na linha
+    	update wallet set value = value + new.value where id = new.person_id;
+    end if;
+end;
+$$
+;
+
+create trigger trg_contribution_control
+	after update
+	on contributions
+	for each row
+	execute procedure fun_contribution_control()
+;
+
+create table consumption
+(
+	id serial not null
+		constraint pk_consumption_id
+			primary key,
+	status char,
+	date timestamp,
+	shift course_shift,
+	person_id integer
+		constraint fk_person_id
+			references person
+)
+;
+
+create or replace function fun_consumption_control() returns trigger
+	language plpgsql
+as $$
+declare
+	wallet_value decimal(10,2);
+    group_value decimal (10,2);
+begin
+	if(TG_OP = 'INSERT') then
+    	select w.value from wallet w where w.id = new.person_id into wallet_value; 
+        if(wallet_value <= 0) then
+        	raise exception 'Not enough money';
+        end if; 
+        select pg.value from person_group pg join person p on p.group_id = pg.id
+        where p.id = new.person_id into group_value;
+        if((wallet_value - group_value) < 0) then 
+        	raise exception 'Not enough money'; 
+        else 
+        	if((new.date - current_date)  >= interval '1 day' ) then
+        		update wallet set value = value - group_value where id = new.person_id;
+            else 
+            	raise exception 'Too soon for consumption';
+        	return new;
+        end if;
+    end if; 
+   end if; 
+    if(TG_OP = 'UPDATE') then 
+		if((new.date - dcurrent_date)  >= interval '1 day' ) then
+        	return new; 
+		else 
+        	raise exception 'To soon to changed consumption';
+        end if; 
+    end if; 
+    if (TG_OP = 'DELETE') then
+  	  if((old.date - current_date) >= interval '1 day' ) then
+    	select w.value from wallet w where w.id = old.person_id into wallet_value; 
+        select pg.value from person_group pg join person p on p.group_id = pg.id
+        where p.id = old.person_id into group_value;
+        update wallet set value = value + group_value where id = old.person_id; 
+        	
+        end if;
+        return old; 
+    end if; 
+    return new; 
+end;
+$$
+;
+;
+
+create trigger trg_consumption_control
+	before insert or update or delete
+	on consumption
+	for each row
+	execute procedure fun_consumption_control()
+;
+
+create table debt
+(
+	id serial not null
+		constraint pk_debt_id
+			primary key,
+	date timestamp not null,
+	value numeric(10,2) not null,
+	consumption_id integer not null
+		constraint fk_debt_consumption_id
+			references consumption,
+	wallet_id integer
+		constraint fk_debt_wallet_id
+			references wallet
+)
+;
+
+CREATE VIEW vw_consumption_all_paid AS SELECT p.registration_number AS matricula,
+    p.name AS nome,
+        CASE p.status
+            WHEN 'A'::bpchar THEN 'ATIVO'::text
+            WHEN 'I'::bpchar THEN 'INATIVO'::text
+            ELSE NULL::text
+        END AS ativo,
+    p.email,
+    c.date AS data,
+        CASE c.shift
+            WHEN 'T'::bpchar THEN 'TARDE'::text
+            WHEN 'M'::bpchar THEN 'MANHA'::text
+            WHEN 'N'::bpchar THEN 'NOITE'::text
+            ELSE NULL::text
+        END AS turno,
+    sum(pg.value) AS total_gasto
+   FROM ((person p
+     JOIN consumption c ON ((p.id = c.person_id)))
+     JOIN person_group pg ON ((p.group_id = pg.id)))
+  GROUP BY p.id, c.date, c.shift
+;
+
+CREATE VIEW vw_contribution_all_gain AS SELECT p.registration_number AS numero_matricula,
+        CASE p.status
+            WHEN 'A'::bpchar THEN 'ATIVO'::text
+            WHEN 'I'::bpchar THEN 'INATIVO'::text
+            ELSE NULL::text
+        END AS ativo,
+    p.email,
+    b.date AS data,
+    sum(pg.value) AS sum
+   FROM (((person p
+     JOIN wallet w ON ((p.wallet_id = w.id)))
+     JOIN debt b ON ((b.wallet_id = w.id)))
+     JOIN person_group pg ON ((pg.id = p.group_id)))
+  GROUP BY p.id, b.date
+;
+
+CREATE VIEW vw_comsumption_by_shift AS SELECT
+        CASE c.shift
+            WHEN 'T'::bpchar THEN 'TARDE'::text
+            WHEN 'M'::bpchar THEN 'MANHA'::text
+            WHEN 'N'::bpchar THEN 'NOITE'::text
+            ELSE NULL::text
+        END AS turno,
+    sum(pg.value) AS total
+   FROM ((consumption c
+     JOIN person p ON ((c.person_id = p.id)))
+     JOIN person_group pg ON ((p.group_id = pg.id)))
+  GROUP BY c.shift
+;
+
+create function function_valid_cpf(text) returns boolean
+	language plpgsql
+as $$
+DECLARE
+ v_string text := $1;
+ v_caldv1 int4;
+ v_caldv2 int4;
+ v_dv1 int4;
+ v_dv2 int4;
+ v_array1 text[] ;
+ v_array2 text[] ;
+ v_tst_string int4;
+BEGIN
+ v_string := translate(v_string, './-', '');
+
+  v_dv1 := (substring(v_string, 10, 1))::int4;
+  v_dv2 := (substring(v_string, 11, 1))::int4;
+  v_string := substring(v_string, 1, 9);
+  /* COLETA DIG VER 1 CPF */
+  v_caldv1 := 0;
+  FOR va IN 1..9 LOOP
+   v_caldv1 := v_caldv1 + ((SELECT substring(v_string, va, 1))::int4 * (11 - va));
+  END LOOP;
+  v_caldv1 := v_caldv1 % 11;
+  IF (v_caldv1 = 0) OR (v_caldv1 = 1) THEN
+   v_caldv1 := 0;
+  ELSE
+   v_caldv1 := 11 - v_caldv1;
+  END IF;
+  /* COLETA DIG VER 2 CPF */
+  v_caldv2 := 0;
+  FOR va IN 1..10 LOOP
+   v_caldv2 := v_caldv2 + ((SELECT substring((v_string || v_caldv1::text), va, 1))::int4 * (12 - va));
+  END LOOP;
+  v_caldv2 := v_caldv2 % 11;
+  IF (v_caldv2 = 0) OR (v_caldv2 = 1) THEN
+   v_caldv2 := 0;
+  ELSE
+   v_caldv2 := 11 - v_caldv2;
+  END IF;
+  /* TESTA */
+  IF (v_caldv1 = v_dv1) AND (v_caldv2 = v_dv2) THEN
+   RETURN TRUE;
+  ELSE
+   RETURN FALSE;
+  END IF;
+
+RETURN FALSE;
+END;
+$$
+;
+
+create function fun_valid_email(text) returns boolean
+	language plpgsql
+as $$
+DECLARE
+  v_string text := $1;
+BEGIN
+  IF( (v_string ~ '^[a-z_.-]*.@gmail.com.*$') OR (v_string ~ '^[a-z_.-]*.@gmail.com.*$')
+     OR (v_string ~ '^[a-z_.-]*.@gmail.com.*$')) THEN
+    return false;
+  END IF;
+  return true;
+END;
+$$
+;
+
+create or replace function fun_all_money_by_person_contribution(idPerson Integer) returns table (
+	id integer, 
+    person_name varchar(100),
+    registration_number varchar(100),
+    contribution_value decimal(10,2)
+) as $$ 
+ 
+ begin 
+ 
+	return QUERY select p.id,p.name,p.registration_number,
+    sum(co.value) as contribution_value
+    from person p 
+    join contributions co on co.person_id = p.id
+    join person_group pg on p.group_id = pg.id
+    where p.id = idPerson 
+    group by p.id;
+    
+end; 
+$$ language 'plpgsql';
+
+
+create or replace function fun_all_consumption_money_by_period(initial_date timestamp without time zone, 
+                                                               final_date timestamp without time zone)
+returns table (
+	consumption_value decimal(10,2),
+	date_time timestamp with time zone, 
+    total_consumption bigint
+) as $$
+
+begin 
+
+	return QUERY select (COUNT(c.*) * pg.value) as consumption_value, 
+    			 now() as date_time, COUNT(c.*) as total_consumption
+    			 from person p join consumption c on p.id = c.person_id 
+                 			   join person_group pg on p.group_id= pg.id
+                 where date between initial_date and final_date
+                 group by p.id, pg.value;
+end; 
+$$ language 'plpgsql'
+
+
+
+create function fun_validation_person() returns trigger
+	language plpgsql
+as $$
+DECLARE 
+  registration BOOLEAN; 
+  phone boolean;
+  cpf BOOLEAN;
+  email boolean;
+begin
+  select * from function_valid_cpf(new.cpf) into cpf;
+  select * from fun_valid_email(new.email) into email; 
+  
+    if(cpf != true) then
+    	raise exception 'Invalid CPF';
+    end if;
+    if(email != TRUE )  then
+    	raise exception 'Invalid email';
+    end if;
+    return new;
+end;
+$$
+;
+

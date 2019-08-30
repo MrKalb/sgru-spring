@@ -1,0 +1,489 @@
+{
+	"info": {
+		"_postman_id": "c814cdce-3c27-40e9-b838-3c12b0bed04b",
+		"name": "SGRU",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Group",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "bobspassword",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "bob",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/group/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"group",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Group",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "73fb292d-9370-431e-9a9b-767ecdc68c60",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "ben",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "benspassword",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"description\":\"Teste\",\n\t\"value\": \"19.35\",\n\t\"status\":\"A\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/group",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"group"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Group",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "73fb292d-9370-431e-9a9b-767ecdc68c60",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 2,\n    \"description\": \"teta cabeluda\",\n    \"value\": 19.35,\n    \"status\": \"I\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/group/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"group",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Person",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "bobspassword",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "bob",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\":\"Igor\",\n\t\"phone\":\"91740615\",\n\t\"email\":\"ikalb9@gmail.com\",\n\t\"status\":\"A\",\n\t\"age\":20,\n\t\"cpf\":\"01170032044\",\n\t\"group\":{\n\t\t\"id\":\"1\",\n\t\t\"description\":\"Teste\",\n\t\t\"value\":19.35,\n\t\t\"status\":\"null\"\n\t},\n\t\"city\":{\n\t\t\"id\":\"1\",\n\t\t\"description\":\"Erechim\",\n\t\t\"state\":{\n\t\t\t\"id\":1,\n\t\t\t\"description\":\"Rio Grande do Sul\",\n\t\t\t\"uf\":\"RS\"\n\t\t}\n\t},\n\t\"wallet\":null\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/person",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"person"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get person",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/person",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"person"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Consumption ",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "ben",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "benspassword",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\t\"date\": \"2018-06-15T10:18\",\n\t\t\"shift\":\"T\",\n\t\t\"status\":null\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/consumption",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"consumption"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Consumption",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "120198",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "0100161",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 18,\n    \"date\": \"2018-06-15T10:18:00\",\n    \"shift\": \"N\",\n    \"status\": null\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/consumption",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"consumption"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Course",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"description\":\"ADS\",\n\t\"level\":{\n\t\t\"id\":3,\n\t\t\"description\":\"Superior\"\n\t},\n\t\"shift\":\"M\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/course",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"course"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Course",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 6,\n    \"description\": \"Tecnico em suporte\",\n    \"shift\": \"M\",\n    \"level\": {\n        \"id\": 4,\n        \"description\": \"Tecnico\"\n    }\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/course",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"course"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Contribution",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "120198",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "0100161",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"date\":\"2018-09-16T18:03\",\n\t\"gru\":\"abcdefgh12345\",\n\t\"value\":20.00\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/contribution",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"contribution"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET user",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "120198",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "0100161",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/user",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Put Contributions",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "120198",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "0100161",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 3,\n    \"value\": 20,\n    \"gru\": \"abcdefgh12345\",\n    \"date\": \"2018-09-16T18:03:00\",\n    \"paymentStatus\":\"S\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/contribution",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"contribution"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Contribution",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "120198",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "0100161",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8080/contribution",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"contribution"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

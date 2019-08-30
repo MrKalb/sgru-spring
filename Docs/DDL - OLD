@@ -1,0 +1,123 @@
+create domain person_status char
+check(value in ('A','I'));
+
+create domain course_shift char
+check (value in('I','M','N','T'));
+
+
+CREATE TABLE person(
+    id serial,
+    phone varchar(30),
+    email varchar(100),
+    age integer,
+    status person_status, 
+    name varchar(255),
+    wallet_id integer, 
+    group_id integer, 
+    city_id integer,
+    course_id integer, 
+    
+    constraint pk_person_id primary key (id)
+);
+create table person_group (
+    id serial,
+    description text, 
+    value decimal(8,2),
+    
+    constraint pk_person_group_id primary key(id)
+);
+
+
+create table course (
+	id serial, 
+    description text, 
+    shift course_shift,
+    level_id integer,
+    
+    constraint pk_curso_id primary key(id)
+);
+
+create table level(
+	id serial,
+	description varchar(250),
+	constraint pk_level_id primary key(id)
+);
+
+
+create table state(
+	id serial, 
+    description varchar(50),
+    UF char(2), 
+    
+    constraint pk_state_id primary key(id)
+);
+
+create table city(
+	id serial, 
+    description varchar(60),
+    state_id integer,
+    
+    constraint pk_city_id primary key(id),
+    constraint fk_city_state_id foreign key (state_id) references state(id)
+);
+
+create table wallet(
+		id serial, 
+        value decimal(15,2),    
+    
+    constraint pk_wallet_id primary key(id)
+);
+
+create table contributions(
+	id serial,
+	gru varchar(250),
+	date timestamp, 
+	value decimal(15,2),
+	
+	constraint pk_contributions_id primary key(id)
+);
+
+create table wallet_contributions(
+	wallet_id integer, 
+	contributions_id integer, 
+
+	constraint pk_wallet_contributions_id primary key(wallet_id,contributions_id)
+);
+
+create table consumption(
+    id serial,
+    status char, 
+    date timestamp, 
+    shift course_shift, 
+    
+    constraint pk_consumption_id primary key(id)
+);
+
+create table person_consumption(
+	consumption_id integer,
+    person_id integer,
+    
+    constraint fk_pes_agend foreign key(person_id) references person(id),
+    constraint fk_consumption_id foreign key(consumption_id) references consumption(id)
+);
+
+create table debt (
+    id serial, 
+    date timestamp, 
+    value decimal(10,2),
+    consumption_id integer, 
+    wallet_id integer, 
+
+    constraint pk_debt_id primary key(id),
+    constraint fk_debt_consumption_id foreign key (consumption_id) references consumption (id),
+    constraint fk_debt_wallet_id foreign key (wallet_id) references wallet(id)
+
+);
+ 
+alter table person add constraint fk_wallet_id foreign key(wallet_id) references wallet(id);
+alter table person add constraint fk_person_group_id foreign key (group_id) references person_group(id);
+alter table person add constraint fk_city_id foreign key (city_id) references city(id);
+alter table person add constraint fk_course_id foreign key (course_id) references course(id);
+alter table course add constraint fk_level_id foreign key (level_id) references level(id);
+alter table wallet_contributions add constraint fk_wallet_fk foreign key(wallet_id) references wallet(id);
+alter table wallet_contributions add constraint fk_aportes_fk foreign key (contributions_id) references contributions(id);

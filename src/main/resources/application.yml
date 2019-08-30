@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/sgru
+    username: postgres
+    password: admin 
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: none
+      database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    properties: 
+      hibernate:
+        temp: 
+          use_jdbc_metadata_defaults: false
+  ldap:
+    embedded:
+      ldif: classpath:test-server.ldif
+      base-dn: dc=springframework,dc=org
+      port: 8389 
+server:
+  port: 8088
