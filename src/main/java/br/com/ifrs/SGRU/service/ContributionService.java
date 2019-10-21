@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,17 +19,12 @@ import br.com.ifrs.SGRU.repository.ContributionRepository;
 import br.com.ifrs.SGRU.repository.PersonRepository;
 
 @Service
-public class ContributionService {
+@Slf4j
+public class ContributionService extends BaseService {
 
 	@Autowired
 	private ContributionRepository repository;
-	
-	@Autowired
-	private PersonRepository personRepository; 
-	
-	@Autowired
-	private ModelMapper mapper; 
-	
+
 	public ContributionEntity createContribution(ContributionsDTO contribution) {
 		ContributionEntity entity = new ContributionEntity();
 		entity.setDate(contribution.getDate());
@@ -39,9 +35,9 @@ public class ContributionService {
 
 		Optional<PersonEntity> person = personRepository.findByRegistrationNumber(auth.getName());
 		*/
-		PersonEntity person = mapper.map(contribution.getPerson(), PersonEntity.class);
+		PersonEntity person = modelMapper.map(contribution.getPerson(), PersonEntity.class);
 		entity.setPerson(person);
-		
+		log.info("createContribution - add new contribution for person : {}", person.getName());
 		return repository.save(entity);
 		
 	}
@@ -50,29 +46,27 @@ public class ContributionService {
 		entity.setPaymentStatus(contribution.getPaymentStatus());
 		entity.setGru(contribution.getGru());
 		return repository.save(entity);
-		
-		
 	}
 	
 	public List<ContributionEntity> listContribution(String cpf, String matricula) {
 		//Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Optional<PersonEntity> person = null; 
+		Optional<PersonEntity> person = Optional.empty();
 		if(!StringUtils.isEmpty(cpf)) {
 			person = personRepository.findByCpf(cpf);
 		} else if (!StringUtils.isEmpty(matricula)) {			
 			person = personRepository.findByRegistrationNumber(matricula);
 		}
-		
 		if(person.isPresent()) {
-			
 			List<ContributionEntity> contribution = this.repository.findByPersonId(person.get().getId());
 			if(!CollectionUtils.isEmpty(contribution)) {
 				return contribution; 
 			} else {
-				throw new EntityNotFoundException();
+				log.error("listContribution - Contribution not found for person: {}", person.get().getName());
+				throw new EntityNotFoundException("Contribution not found");
 			}
 		}else {
-			throw new EntityNotFoundException();
+			log.error("listContribution - Person not found for cpf :{}, please verify", cpf);
+			throw new EntityNotFoundException("Person not found");
 		}
 	}
 	public List<ContributionEntity> getAll(String paid) {

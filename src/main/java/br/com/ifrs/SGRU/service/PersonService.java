@@ -16,14 +16,8 @@ import br.com.ifrs.SGRU.entities.PersonEntity;
 import br.com.ifrs.SGRU.repository.PersonRepository;
 
 @Service
-public class PersonService {
-	
-	@Autowired
-	private PersonRepository personRepository; 
+public class PersonService extends BaseService {
 
-	@Autowired
-	private ModelMapper modelMapper; 
-	
 	public PersonEntity createPerson(PersonDTO person) {
 		PersonEntity personEntity = this.modelMapper.map(person, PersonEntity.class);
 		return this.personRepository.save(personEntity);

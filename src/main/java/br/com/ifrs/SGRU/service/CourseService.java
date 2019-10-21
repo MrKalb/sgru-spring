@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,14 +16,12 @@ import br.com.ifrs.SGRU.entities.LevelEntity;
 import br.com.ifrs.SGRU.repository.CourseRepository;
 
 @Service
-public class CourseService {
+@Slf4j
+public class CourseService extends BaseService {
 
 	@Autowired
 	public CourseRepository repository; 
-	
-	@Autowired
-	public ModelMapper modelMapper; 
-	
+
 	public CourseEntity createCourse(CourseDTO course) {
 		
 		CourseEntity entity = modelMapper.map(course, CourseEntity.class);
@@ -55,7 +54,8 @@ public class CourseService {
 		if(course.isPresent()) {
 			return course.get(); 
 		} else {
-			throw new EntityNotFoundException();
+			log.error("findById - course not found for id: {}",id);
+			throw new EntityNotFoundException("Course Not Found");
 		}
 	}
 	
