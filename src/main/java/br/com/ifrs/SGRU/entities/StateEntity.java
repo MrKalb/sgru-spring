@@ -21,12 +21,7 @@ import lombok.Data;
 @Entity
 @Table(name="state")
 @Data
-public class StateEntity implements AbstractEntity<Integer>, Serializable {
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class StateEntity implements Serializable {
 
 	@Id
     private Integer id; 
@@ -36,9 +31,4 @@ public class StateEntity implements AbstractEntity<Integer>, Serializable {
     
     @Column
     private String uf; 
-    
-    @Override
-    public Integer getId() {
-        return id; 
-    }
 }

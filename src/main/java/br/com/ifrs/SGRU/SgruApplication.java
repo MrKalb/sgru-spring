@@ -11,10 +11,5 @@ public class SgruApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SgruApplication.class, args);
 	}
-	
-	@Bean
-	public ModelMapper modelMapper() {
-	    return new ModelMapper();
-	}
-	
+
 }

@@ -30,12 +30,7 @@ import lombok.Data;
 @DynamicUpdate
 @Table(name="consumption")
 @Data
-public class ConsumptionEntity implements AbstractEntity<Integer>,Serializable {
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class ConsumptionEntity implements Serializable {
 
 	@Id
 	@SequenceGenerator(name = "consumption_id_seq", sequenceName = "consumption_id_seq", allocationSize = 1)
@@ -55,9 +50,4 @@ public class ConsumptionEntity implements AbstractEntity<Integer>,Serializable {
     @OneToOne
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private PersonEntity person; 
-        
-	@Override
-	public Integer getId() {
-		return this.id;
-	}
 }
