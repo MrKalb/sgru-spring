@@ -26,13 +26,8 @@ import lombok.Data;
 @Table(name="level")
 @DynamicUpdate
 @Data
-public class LevelEntity implements AbstractEntity<Integer>, Serializable {
+public class LevelEntity implements Serializable {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
 	@Id
 	@SequenceGenerator(name = "level_id_seq", sequenceName = "level_id_seq", allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "level_id_seq")
@@ -41,9 +36,4 @@ public class LevelEntity implements AbstractEntity<Integer>, Serializable {
     
 	@Column
     private String description;
-    
-    @Override
-    public Integer getId() {
-        return id; 
-    }
 }

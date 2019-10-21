@@ -19,12 +19,7 @@ import lombok.Data;
 @Entity
 @Table(name="wallet")
 @Data
- public class WalletEntity implements AbstractEntity<Integer>,Serializable {
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+ public class WalletEntity implements Serializable {
 
 	@Id
 	@SequenceGenerator(name = "wallet_id_seq", sequenceName = "wallet_id_seq", allocationSize = 1)
@@ -34,9 +29,4 @@ import lombok.Data;
     
     @Column(name="value")
     private Double value; 
-    
-    @Override
-    public Integer getId() {
-        return id; 
-    }
 }

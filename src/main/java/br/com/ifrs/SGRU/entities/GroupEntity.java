@@ -28,12 +28,7 @@ import lombok.Data;
 @DynamicUpdate
 @Table(name="person_group")
 @Data
-public class GroupEntity implements AbstractEntity<Integer>, Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class GroupEntity implements Serializable {
 
 	@Id
 	@SequenceGenerator(name = "person_group_id_seq", sequenceName = "person_group_id_seq", allocationSize = 1)
@@ -41,19 +36,14 @@ public class GroupEntity implements AbstractEntity<Integer>, Serializable {
 	@Column(name = "id", columnDefinition = "serial")
 	private Integer id;
 
-	@Column(name="description")
+	@Column(name = "description")
 	@NotNull
 	private String description;
 
-	@Column(name="value")
+	@Column(name = "value")
 	@NotNull
 	private Double value;
 
 	@Column
-	private String status; 
-	
-	@Override
-	public Integer getId() {
-		return id;
-	}
+	private String status;
 }

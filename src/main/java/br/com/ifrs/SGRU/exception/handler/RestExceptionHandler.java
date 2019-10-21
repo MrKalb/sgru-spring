@@ -28,5 +28,4 @@ public class RestExceptionHandler {
     			ex.getMessage());
     	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
     }
-    
 }

@@ -29,12 +29,7 @@ import lombok.Data;
 @Table(name="course")
 @DynamicUpdate
 @Data
-public class CourseEntity implements AbstractEntity<Integer>, Serializable {
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class CourseEntity implements Serializable {
 
 	@Id
 	@SequenceGenerator(name = "course_id_seq", sequenceName = "course_id_seq", allocationSize = 1)
@@ -51,10 +46,4 @@ public class CourseEntity implements AbstractEntity<Integer>, Serializable {
     @OneToOne
     @JoinColumn(name="level_id")
     private LevelEntity level; 
-    
-    
-    @Override
-    public Integer getId() {
-        return id; 
-    }
 }

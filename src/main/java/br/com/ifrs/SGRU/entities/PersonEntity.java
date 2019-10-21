@@ -24,12 +24,7 @@ import lombok.Data;
 @Table(name = "person")
 @DynamicUpdate
 @Data
-public class PersonEntity implements Serializable, AbstractEntity<Integer> {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class PersonEntity implements Serializable {
 
 	@Id
 	@SequenceGenerator(name = "person_id_seq", sequenceName = "person_id_seq", allocationSize = 1)
@@ -69,9 +64,4 @@ public class PersonEntity implements Serializable, AbstractEntity<Integer> {
 
 	@OneToOne
 	private CourseEntity course;
-	
-	@Override
-	public Integer getId() {
-		return id;
-	}
 }

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import br.com.ifrs.SGRU.entities.PersonEntity;
 import br.com.ifrs.SGRU.repository.PersonRepository;
 
 @Service
+@Slf4j
 public class PersonService extends BaseService {
 
 	public PersonEntity createPerson(PersonDTO person) {
@@ -23,14 +25,14 @@ public class PersonService extends BaseService {
 		return this.personRepository.save(personEntity);
 	}
 	
-	public PersonEntity queryPersonByCpf(String param) {
-		Optional<PersonEntity> person = this.personRepository.findByCpf(param);
+	public PersonEntity queryPersonByCpf(String cpf) {
+		Optional<PersonEntity> person = this.personRepository.findByCpf(cpf);
 		if(person.isPresent()) {
 			return person.get();
 		} else {
-			throw new EntityNotFoundException();
+			log.error("queryPersonByCpf - Person not found for cpf: {}", cpf);
+			throw new EntityNotFoundException("Person not found");
 		}
-		
 	}
 	
 	public PersonEntity queryPersonByRegistration(String param) {

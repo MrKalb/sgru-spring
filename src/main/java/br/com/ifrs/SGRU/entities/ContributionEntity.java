@@ -30,12 +30,7 @@ import lombok.Data;
 @DynamicUpdate
 @Table(name="contributions")
 @Data
-public class ContributionEntity implements AbstractEntity<Integer>, Serializable {
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class ContributionEntity implements Serializable {
 
 	@Id
 	@SequenceGenerator(name = "contributions_id_seq", sequenceName = "contributions_id_seq", allocationSize = 1)
@@ -57,9 +52,4 @@ public class ContributionEntity implements AbstractEntity<Integer>, Serializable
     
     @Column(name="payment_status")
     private String paymentStatus; 
-    
-    @Override
-    public Integer getId() {
-        return id; 
-    }
 }
