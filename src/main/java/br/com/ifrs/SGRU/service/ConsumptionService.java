@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,7 @@ import br.com.ifrs.SGRU.repository.ConsumptionRepository;
 import br.com.ifrs.SGRU.repository.PersonRepository;
 
 @Service
+@Slf4j
 public class ConsumptionService {
 
 	@Autowired
@@ -43,9 +45,9 @@ public class ConsumptionService {
 			entity.setPerson(person.get());
 			return consumptionRepository.save(entity);
 		} else {
-			throw new BusinessException("Error trying to save consumption", "");
+			log.error("createConsumption - person not found or not logged in, please verify, person name: {}",auth.getName());
+			throw new EntityNotFoundException("Error trying to save consumption");
 		}
-
 	}
 	
 	public Optional<ConsumptionEntity> getById(Integer id) {
@@ -73,10 +75,12 @@ public class ConsumptionService {
 			if(!CollectionUtils.isEmpty(consumption)) {
 				return consumption; 
 			} else {
-				throw new EntityNotFoundException();
+			    log.error("Consumption not found for personId: {}", person.get().getName());
+				throw new EntityNotFoundException("Consumption not found");
 			}
 		} else {
-			throw new EntityNotFoundException();
+		    log.error("findByPerson - person not found or not logged in, please verify, auth name: {}",auth.getName());
+			throw new EntityNotFoundException("Person not found");
 		}
 	}
 
