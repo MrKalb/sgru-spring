@@ -3,7 +3,6 @@ package br.com.ifrs.SGRU.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +27,7 @@ public class ConsumptionController {
 	
 	@PostMapping("/consumption")
 	@PreAuthorize("hasRole('ROLE_DEVELOPERS')")
-	public ResponseEntity<?> createConsumption(@RequestBody ConsumptionDTO consumption) throws PSQLException {
+	public ResponseEntity<?> createConsumption(@RequestBody ConsumptionDTO consumption) {
 		return ResponseEntity.ok(this.service.createConsumption(consumption));
 	}
 	

@@ -4,9 +4,7 @@ import br.com.ifrs.SGRU.dto.ConsumptionDTO;
 import br.com.ifrs.SGRU.entities.ConsumptionEntity;
 import br.com.ifrs.SGRU.entities.PersonEntity;
 import br.com.ifrs.SGRU.repository.ConsumptionRepository;
-import br.com.ifrs.SGRU.repository.PersonRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +25,7 @@ public class ConsumptionService extends BaseService {
 	private ConsumptionRepository consumptionRepository;
 
 	@Transactional
-	public ConsumptionEntity createConsumption(ConsumptionDTO consumption) throws PSQLException {
+	public ConsumptionEntity createConsumption(ConsumptionDTO consumption) {
 		ConsumptionEntity entity = new ConsumptionEntity();
 		entity.setDate(consumption.getDate());
 		entity.setShift(consumption.getShift());
