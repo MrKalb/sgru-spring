@@ -1,12 +1,10 @@
 package br.com.ifrs.SGRU.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
-
+import br.com.ifrs.SGRU.dto.ConsumptionDTO;
+import br.com.ifrs.SGRU.entities.ConsumptionEntity;
+import br.com.ifrs.SGRU.entities.PersonEntity;
+import br.com.ifrs.SGRU.repository.ConsumptionRepository;
+import br.com.ifrs.SGRU.repository.PersonRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,22 +13,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import br.com.ifrs.SGRU.dto.ConsumptionDTO;
-import br.com.ifrs.SGRU.entities.ConsumptionEntity;
-import br.com.ifrs.SGRU.entities.PersonEntity;
-import br.com.ifrs.SGRU.exceptions.BusinessException;
-import br.com.ifrs.SGRU.repository.ConsumptionRepository;
-import br.com.ifrs.SGRU.repository.PersonRepository;
+import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
-public class ConsumptionService {
+public class ConsumptionService extends BaseService {
 
 	@Autowired
 	private ConsumptionRepository consumptionRepository;
-
-	@Autowired
-	private PersonRepository personRepository;
 
 	@Transactional
 	public ConsumptionEntity createConsumption(ConsumptionDTO consumption) throws PSQLException {

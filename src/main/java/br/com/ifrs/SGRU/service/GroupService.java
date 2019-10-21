@@ -11,14 +11,11 @@ import br.com.ifrs.SGRU.entities.GroupEntity;
 import br.com.ifrs.SGRU.repository.GroupRepository;
 
 @Service
-public class GroupService {
+public class GroupService extends BaseService {
 
 	@Autowired
 	private GroupRepository groupRepository; 
-	
-	@Autowired
-	private ModelMapper modelMapper; 
-	
+
 	public GroupEntity createGroup(GroupDTO group) {
 		GroupEntity groupEntity = modelMapper.map(group, GroupEntity.class);
 		
